@@ -1,4 +1,6 @@
 import sys
+from pprint import pprint
+
 import pygame
 import pygame.display
 
@@ -9,10 +11,11 @@ pygame.init()
 screen_height = 768
 screen_width = 1024
 screen = pygame.display.set_mode((screen_width, screen_height))
-game_state = "singleplayer"
+game_state = "menu"
 clock = pygame.time.Clock()
 frames = 60
 cell_size = 74
+isMouseTurn = False
 
 menu_background_img = pygame.image.load("images/menu.png")
 menu_background_img = pygame.transform.scale(menu_background_img, (screen_width, screen_height))
@@ -66,7 +69,7 @@ def draw_menu():
 
     return single_player_button_rect, multi_player_button_rect, quit_button_rect
 
-def draw_singlep_game(game):
+def draw_game(game):
     screen.fill((175, 215, 70))
 
     text_surf = score_font.render("Score: " + str(game.score), True, (255, 255, 255))
@@ -84,7 +87,7 @@ def draw_singlep_game(game):
         starting_x = offset_x if i % 2 == 0 else offset_x + (cell_size / 2)
         for k in range(11):
             screen.blit(map_hexagon_img, (starting_x, starting_y))
-            if mouse.pos.y == i and mouse.pos.x == k:
+            if mouse.pos.y == k and mouse.pos.x == i:
                 mouse.draw_mouse(starting_x, starting_y)
             elif game.game_board[i][k] == 2:
                 screen.blit(map_hexagon_metal_img, (starting_x, starting_y))
@@ -93,22 +96,6 @@ def draw_singlep_game(game):
                   not hex_hovered):
                 screen.blit(map_hexagon_hover_img, (starting_x, starting_y))
                 hex_hovered = True
-            starting_x += cell_size
-        starting_y += int(cell_size * 0.75)
-
-def raise_metal_wall(game):
-    offset_x = 95
-    offset_y = 90
-    starting_y = offset_y
-    for i in range(11):
-        starting_x = offset_x if i % 2 == 0 else offset_x + (cell_size / 2)
-        for k in range(11):
-            if (starting_x < pygame.mouse.get_pos()[0] < starting_x + cell_size and
-                    starting_y < pygame.mouse.get_pos()[1] < starting_y + cell_size and
-                    game.game_board[i][k] == 0):
-                game.game_board[i][k] = 2
-                game.score -= 50
-                return
             starting_x += cell_size
         starting_y += int(cell_size * 0.75)
 
@@ -140,16 +127,31 @@ while True:
                     pygame.quit()
                     sys.exit()
             elif game_state == "singleplayer":
-                raise_metal_wall(game,)
+                if game.raise_metal_wall(cell_size):
+                    path = game.find_shortest_path()
+                    print(path)
+                    pprint(game.game_board)
+                    if len(path) > 1:
+                        print(game.move_mouse(path[1][0], path[1][1]))
+                    else:
+                        print("Mouse is on border")
+                    pprint(game.game_board)
+                    print("--------------------------------------------------------")
             elif game_state == "multiplayer":
-                print()
-
+                if not isMouseTurn:
+                    if game.raise_metal_wall(cell_size):
+                        pprint(game.game_board)
+                        isMouseTurn = True
+                else:
+                    if game.player_move_mouse(cell_size):
+                        pprint(game.game_board)
+                        isMouseTurn = False
     if game_state == "menu":
         single_player_button_rect, multi_player_button_rect, quit_button_rect = draw_menu()
     elif game_state == "singleplayer":
-        draw_singlep_game(game)
+        draw_game(game)
     elif game_state == "multiplayer":
-        draw_multip_game()
+        draw_game(game)
 
     # mouse.draw_mouse()
     pygame.display.update()
