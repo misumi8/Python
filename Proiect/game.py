@@ -5,7 +5,11 @@ class Game:
     def __init__(self, mouse):
         self.mouse = mouse
         self.game_board = [[0 for i in range(11)] for k in range(11)]
+        self.game_board[3][5] = 2
+        self.game_board[4][5] = 2
+        self.game_board[0][5] = 2
         self.game_board[int(self.mouse.pos.x)][int(self.mouse.pos.y)] = 1
+        self.score = 20000
 
     # def draw_board(self):
     #     # awd

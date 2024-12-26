@@ -6,8 +6,9 @@ class Mouse:
         self.cell_size = cell_size
         self.screen = screen
         self.pos = Position(5, 5)
+        self.mouse_img = pygame.image.load("images/mouse.png")
+        self.mouse_img = pygame.transform.scale(self.mouse_img, (cell_size, cell_size))
 
-    def draw_mouse(self):
-        mouse_rect = pygame.Rect(self.pos.x * self.cell_size, self.pos.y * self.cell_size, self.cell_size, self.cell_size)
-        pygame.draw.rect(self.screen, (200, 50, 20), mouse_rect)
+    def draw_mouse(self, x, y):
+        self.screen.blit(self.mouse_img, (x - 5, y))
 
