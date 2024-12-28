@@ -11,4 +11,3 @@ class Mouse:
 
     def draw_mouse(self, x, y):
         self.screen.blit(self.mouse_img, (x - 5, y))
-
