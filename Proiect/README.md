@@ -1,4 +1,4 @@
-# :mouse2: Trap the Mouse (A:29)
+# Trap the Mouse (A:29) :mouse2:
 ## Description:
 Se va crea o interfata grafica ce va oferi utilizatorului posibilitatea sa joace o partidă de
 TrapTheMouse, atat cu calculatorul, cât și cu un alt opponent. Calculatorul va lua decizii bune

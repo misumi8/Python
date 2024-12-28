@@ -20,7 +20,11 @@ class Game:
         self.game_board[int(self.mouse.pos.x)][int(self.mouse.pos.y)] = 1
         self.score = 20000
 
-    def find_shortest_path(self):
+    def get_random_mouse_move(self, mouse_x, mouse_y):
+        return random.choice([(mouse_x + x, mouse_y + y) for x, y in self.get_valid_moves(mouse_x) if
+                              self.game_board[mouse_x + x][mouse_y + y] == 0])
+
+    def find_shortest_path(self, randomness):
         start_pos_x = self.mouse.pos.x
         start_pos_y = self.mouse.pos.y
         queue = deque([(start_pos_x, start_pos_y, [])])
@@ -29,16 +33,26 @@ class Game:
         while True:
             if not queue:
                 if not self.is_mouse_caught():
-                    return random.choice([(start_pos_x + x, start_pos_y + y) for x, y in self.get_valid_moves(start_pos_x) if self.game_board[start_pos_x + x][start_pos_y + y] == 0])
+                    return self.get_random_mouse_move(start_pos_x, start_pos_y)
                 else:
                     return False
             x, y, path = queue.popleft()
-            # Position is on border
             if self.is_mouse_on_border(x, y):
+                randomne = random.random()
+                print("****************************************", randomne, randomness)
+                if randomne < randomness:
+                    return self.get_random_mouse_move(start_pos_x, start_pos_y)
+                else:
+                    if len(path) > 1:
+                        return path[1][0], path[1][1]
+                    else:
+                        return x, y
+            elif x == 0 or x == len(self.game_board) - 1 or y == 0 or y == len(self.game_board[0]) - 1:
                 if len(path) > 1:
                     return path[1][0], path[1][1]
                 else:
                     return x, y
+
             for direction in self.get_valid_moves(x):
                 next_x = x + direction[0]
                 next_y = y + direction[1]
