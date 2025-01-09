@@ -1,18 +1,19 @@
 import sys
 from pprint import pprint
 from random import random
-
 import pygame
 import pygame.display
-
 from mouse import Mouse
 from game import Game
 
+# Init and set up display
 pygame.init()
 pygame.display.set_caption("Trap the Mouse")
 screen_height = 768
 screen_width = 1024
 screen = pygame.display.set_mode((screen_width, screen_height))
+
+# Game initial settings/states
 game_state = "menu"
 clock = pygame.time.Clock()
 frames = 60
@@ -22,6 +23,7 @@ player_win_state = 0
 multiplayer_win_state = 0
 singlep_randomness = -1
 
+# Images
 step_back_img = pygame.image.load("images/step_back.png")
 step_back_img = pygame.transform.scale(step_back_img, (50, 50))
 step_back_hover_img = pygame.image.load("images/step_back_hover.png")
@@ -44,6 +46,7 @@ map_hexagon_metal_img = pygame.transform.scale(map_hexagon_metal_img, (cell_size
 map_hexagon_hover_img = pygame.image.load("images/hexagon_hover.png")
 map_hexagon_hover_img = pygame.transform.scale(map_hexagon_hover_img, (cell_size, cell_size))
 
+# Fonts
 singlep_button_font = pygame.font.Font("fonts/MouseMemoirs-Regular.ttf", 52)
 multip_button_font = pygame.font.Font("fonts/MouseMemoirs-Regular.ttf", 58)
 score_font = pygame.font.Font("fonts/Roboto-Black.ttf", 45)
@@ -52,6 +55,17 @@ difficulty_selection_title_font = pygame.font.Font("fonts/Roboto-Black.ttf", 55)
 difficulty_selection_font = pygame.font.Font("fonts/MouseMemoirs-Regular.ttf", 45)
 
 def draw_button(screen, rect, text, button_color, font, text_color = (0, 0, 0)):
+    """
+    Draws a button with shadow and text in center.
+
+    Args:
+        screen (pygame.Surface): The screen to draw on
+        rect (pygame.Rect): The rectangle defining the button
+        text (str): Button central text
+        button_color (tuple): RGB color
+        font (pygame.font.Font): Button text font
+        text_color (tuple): RGB text color. Defaults to black
+    """
     shadow_rect = rect.copy()
     shadow_rect.x += 3
     shadow_rect.y += 3
@@ -63,6 +77,11 @@ def draw_button(screen, rect, text, button_color, font, text_color = (0, 0, 0)):
     screen.blit(text_surf, text_rect)
 
 def draw_menu():
+    """
+    Draws the main menu with single player, multiplayer and quit buttons.
+
+    :return: A tuple of three rectangles for single player, multiplayer and quit buttons
+    """
     # screen.fill((175, 215, 70))
     screen.blit(background_img, (0, 0))
     screen.blit(menu_background_img, (0, 0))
@@ -94,6 +113,12 @@ def draw_menu():
     return single_player_button_rect, multi_player_button_rect, quit_button_rect
 
 def draw_difficulty_level_selection(game):
+    """
+    Draws the difficulty level selection box and 3 difficulty buttons (easy, medium, hard).
+
+    :param game: The game object
+    :return: A tuple of three difficulty button rectangles
+    """
     # screen.fill((175, 215, 70))
     screen.blit(background_img, (0, 0))
     text_difficulty = difficulty_selection_title_font.render("DIFFICULTY", True, (245, 245, 245))
@@ -134,6 +159,11 @@ def draw_difficulty_level_selection(game):
     return easy_rect, medium_rect, hard_rect
 
 def draw_game(game):
+    """
+    Draws the game map with the mouse and simple/occupied hexagons
+
+    :param game: The game object
+    """
     # screen.fill((175, 215, 70))
     screen.blit(background_img, (0, 0))
     text_surf = score_font.render("Score: " + str(game.score), True, (255, 255, 255))
@@ -164,6 +194,13 @@ def draw_game(game):
         starting_y += int(cell_size * 0.75)
 
 def draw_player_alert(font, text, color):
+    """
+    Draws a text alert in the center of the screen. Called after the game achieved a final state.
+
+    :param font: Text font
+    :param text: Text string
+    :param color: Text color
+    """
     win_alert = pygame.Rect(0, 0, 250, 75)
     win_alert.center = (screen_width * 0.5, screen_height * 0.47)
     text_surf = font.render(text, True, color)
@@ -172,13 +209,13 @@ def draw_player_alert(font, text, color):
     screen.blit(text_shadow, text_rect.move(2, 2))
     screen.blit(text_surf, text_rect)
 
-# Mouse
 mouse = Mouse(screen, cell_size)
 
-# Game & Game board
 game = Game(mouse)
 
+# Game loop
 while True:
+    # Events handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -281,8 +318,9 @@ while True:
             screen.blit(step_back_hover_img, step_back_button_rect)
         else:
             screen.blit(step_back_img, step_back_button_rect)
-
+    # Update display
     pygame.display.update()
+    # Limit of frames per second
     clock.tick(frames)
 
 
